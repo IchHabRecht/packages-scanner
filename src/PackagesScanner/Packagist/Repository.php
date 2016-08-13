@@ -1,5 +1,5 @@
 <?php
-namespace IchHabRecht\PackagesScanner\Package;
+namespace IchHabRecht\PackagesScanner\Packagist;
 
 use GuzzleHttp\Client;
 
@@ -11,6 +11,11 @@ class Repository
     private $client;
 
     /**
+     * @var string
+     */
+    private $listUrl = 'https://packagist.org/packages/list.json';
+
+    /**
      * @param Client $client
      */
     public function __construct(Client $client = null)
@@ -19,41 +24,14 @@ class Repository
     }
 
     /**
-     * @param string $repositoryUrl
+     * @param string $vendor
      * @return array
      */
-    public function findAllPackagesFromRepository($repositoryUrl)
+    public function findPackagesByVendor($vendor)
     {
-        $packagesJson = $this->getRepositoryContent($repositoryUrl);
-        $packages = $packagesJson['packages'] ?? [];
-        $packages += $this->resolveRepositoryIncludes($repositoryUrl, $packagesJson);
-        $packages += $this->resolveRepositoryProviderIncludes($repositoryUrl, $packagesJson);
-        ksort($packages);
+        $result = $this->client->request('GET', $this->listUrl . '?vendor=' . $vendor);
 
-        return $packages;
-    }
-
-    /**
-     * @param array $packages
-     * @return array
-     */
-    public function splitPackagesByVendor(array $packages)
-    {
-        $packagesByVendor = [];
-
-        foreach ($packages as $packageName => $packagePackages) {
-            if (false === strpos($packageName, '/')) {
-                continue;
-            }
-
-            list($vendor, $name) = explode('/', $packageName);
-            if (!isset($packagesByVendor[$vendor])) {
-                $packagesByVendor[$vendor] = [];
-            }
-            $packagesByVendor[$vendor][$name] = $packagePackages;
-        }
-
-        return $packagesByVendor;
+        return json_decode($result->getBody(), true)['packageNames'];
     }
 
     /**
