@@ -50,11 +50,22 @@ class ValidateCommand extends Command
         $packages = $this->packageRepository->findAllPackagesFromRepository($repositoryUrl);
 
         foreach ($packages as $packageName => $packagePackages) {
-            if (false === strpos($packageName, '/')) {
+            if ($this->isInvalidPackageName($packageName)) {
                 $output->writeln(' - ' . $packageName);
             }
         }
 
         return 0;
+    }
+
+    /**
+     * @param string $packageName
+     * @return bool
+     */
+    protected function isInvalidPackageName($packageName)
+    {
+        return empty($packageName)
+        || !preg_match('{^[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9]([_.-]?[a-z0-9]+)*$}', $packageName)
+        || preg_match('{\.json$}', $packageName);
     }
 }
