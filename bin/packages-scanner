@@ -4,6 +4,7 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use IchHabRecht\PackagesScanner\Command\Vendor\ListCommand;
+use IchHabRecht\PackagesScanner\Command\Vendor\RegisterCommand;
 use IchHabRecht\PackagesScanner\Command\Vendor\ValidateCommand;
 use Symfony\Component\Console\Application;
 
@@ -11,5 +12,6 @@ $application = new Application();
 
 $application->add(new ValidateCommand());
 $application->add(new ListCommand());
+$application->add(new RegisterCommand());
 
 $application->run();
