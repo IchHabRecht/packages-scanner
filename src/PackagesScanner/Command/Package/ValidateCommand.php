@@ -52,6 +52,16 @@ class ValidateCommand extends Command
         foreach ($packages as $packageName => $packagePackages) {
             if ($this->isInvalidPackageName($packageName)) {
                 $output->writeln(' - ' . $packageName);
+                $packageInformation = array_pop($packagePackages);
+                $output->writeln('   - url: ' . ($packageInformation['source']['url'] ?? $packageInformation['dist']['url']));
+                if (!empty($packageInformation['authors'])) {
+                    foreach ($packageInformation['authors'] as $author) {
+                        foreach ($author as $property => $value) {
+                            $output->writeln('   - ' . $property . ': ' . $value);
+                        }
+                    }
+                }
+                $output->writeln('');
             }
         }
 
