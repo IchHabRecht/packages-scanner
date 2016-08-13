@@ -34,29 +34,6 @@ class Repository
     }
 
     /**
-     * @param array $packages
-     * @return array
-     */
-    public function splitPackagesByVendor(array $packages)
-    {
-        $packagesByVendor = [];
-
-        foreach ($packages as $packageName => $packagePackages) {
-            if (false === strpos($packageName, '/')) {
-                continue;
-            }
-
-            list($vendor, $name) = explode('/', $packageName);
-            if (!isset($packagesByVendor[$vendor])) {
-                $packagesByVendor[$vendor] = [];
-            }
-            $packagesByVendor[$vendor][$name] = $packagePackages;
-        }
-
-        return $packagesByVendor;
-    }
-
-    /**
      * @param string $repositoryUrl
      * @return array
      */

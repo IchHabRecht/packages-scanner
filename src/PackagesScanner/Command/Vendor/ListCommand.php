@@ -50,11 +50,7 @@ class ListCommand extends AbstractBaseCommand
         $onlyRegistered = $input->getOption('only-registered');
         $onlyUnregistered = $input->getOption('only-unregistered');
 
-        $vendorNames = array_keys(
-            $this->packageRepository->splitPackagesByVendor(
-                $this->getPackagesFromRepository($input, $output)
-            )
-        );
+        $vendorNames = array_keys($this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output)));
 
         foreach ($vendorNames as $vendor) {
             $packages = $this->packagistRepository->findPackagesByVendor($vendor);

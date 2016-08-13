@@ -44,9 +44,7 @@ class RegisterCommand extends AbstractBaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $packages = $this->packageRepository->splitPackagesByVendor(
-            $this->getPackagesFromRepository($input, $output)
-        );
+        $packages = $this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
 
         foreach ($packages as $vendor => $vendorPackages) {
             $packages = $this->packagistRepository->findPackagesByVendor($vendor);

@@ -12,7 +12,7 @@ abstract class AbstractBaseCommand extends Command
     /**
      * @var Repository
      */
-    protected $packageRepository;
+    private $packageRepository;
 
     /**
      * @param string $name
@@ -55,5 +55,28 @@ abstract class AbstractBaseCommand extends Command
     {
         return !empty($packageName)
         && preg_match('{^[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9]([_.-]?[a-z0-9]+)*$}', $packageName);
+    }
+
+    /**
+     * @param array $packages
+     * @return array
+     */
+    protected function splitPackagesByVendor(array $packages)
+    {
+        $packagesByVendor = [];
+
+        foreach ($packages as $packageName => $packagePackages) {
+            if (false === strpos($packageName, '/')) {
+                continue;
+            }
+
+            list($vendor, $name) = explode('/', $packageName);
+            if (!isset($packagesByVendor[$vendor])) {
+                $packagesByVendor[$vendor] = [];
+            }
+            $packagesByVendor[$vendor][$name] = $packagePackages;
+        }
+
+        return $packagesByVendor;
     }
 }

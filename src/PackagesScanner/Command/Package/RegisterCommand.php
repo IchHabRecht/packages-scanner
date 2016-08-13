@@ -49,7 +49,7 @@ class RegisterCommand extends AbstractBaseCommand
         $excludeVendorNames = explode(',', $input->getOption('exclude-vendor'));
         array_walk($excludeVendorNames, 'trim');
 
-        $packages = $this->packageRepository->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
+        $packages = $this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
 
         foreach ($packages as $vendor => $vendorPackages) {
             if (in_array($vendor, $excludeVendorNames, true)) {
