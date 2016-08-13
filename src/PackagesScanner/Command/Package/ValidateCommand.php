@@ -1,5 +1,5 @@
 <?php
-namespace IchHabRecht\PackagesScanner\Command\Vendor;
+namespace IchHabRecht\PackagesScanner\Command\Package;
 
 use IchHabRecht\PackagesScanner\Package\Repository;
 use Symfony\Component\Console\Command\Command;
@@ -30,9 +30,9 @@ class ValidateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('vendor:validate')
-            ->setDescription('Validate package namespaces')
-            ->setHelp('This command validates the package namespaces found in the provided repository')
+            ->setName('package:validate')
+            ->setDescription('Validate package names')
+            ->setHelp('This command validates the package names found in the provided repository')
             ->addArgument('repository-url', InputArgument::REQUIRED, 'The repository url to your packages.json file');
     }
 
