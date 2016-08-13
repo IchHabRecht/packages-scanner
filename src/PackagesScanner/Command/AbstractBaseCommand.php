@@ -66,7 +66,7 @@ abstract class AbstractBaseCommand extends Command
         $packagesByVendor = [];
 
         foreach ($packages as $packageName => $packagePackages) {
-            if (false === strpos($packageName, '/')) {
+            if (!$this->isValidPackageName($packageName)) {
                 continue;
             }
 
