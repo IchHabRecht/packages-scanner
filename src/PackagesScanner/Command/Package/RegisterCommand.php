@@ -11,11 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RegisterCommand extends AbstractBaseCommand
 {
     /**
-     * @var PackageRepository
-     */
-    private $packageRepository;
-
-    /**
      * @var PackagistRepository
      */
     private $packagistRepository;
@@ -27,8 +22,7 @@ class RegisterCommand extends AbstractBaseCommand
      */
     public function __construct($name = null, PackageRepository $packageRepository = null, PackagistRepository $packagistRepository = null)
     {
-        parent::__construct($name);
-        $this->packageRepository = $packageRepository ?: new PackageRepository();
+        parent::__construct($name, $packageRepository);
         $this->packagistRepository = $packagistRepository ?: new PackagistRepository();
     }
 
@@ -52,16 +46,10 @@ class RegisterCommand extends AbstractBaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $repositoryUrl = $input->getArgument('repository-url');
         $excludeVendorNames = explode(',', $input->getOption('exclude-vendor'));
         array_walk($excludeVendorNames, 'trim');
 
-        $output->writeln('Scanning packages at ' . $repositoryUrl);
-        $output->writeln('');
-
-        $packages = $this->packageRepository->splitPackagesByVendor(
-            $this->packageRepository->findAllPackagesFromRepository($repositoryUrl)
-        );
+        $packages = $this->packageRepository->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
 
         foreach ($packages as $vendor => $vendorPackages) {
             if (in_array($vendor, $excludeVendorNames, true)) {

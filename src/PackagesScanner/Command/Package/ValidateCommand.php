@@ -2,27 +2,11 @@
 namespace IchHabRecht\PackagesScanner\Command\Package;
 
 use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
-use IchHabRecht\PackagesScanner\Package\Repository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ValidateCommand extends AbstractBaseCommand
 {
-    /**
-     * @var Repository
-     */
-    private $packageRepository;
-
-    /**
-     * @param string $name
-     * @param Repository $packageRepository
-     */
-    public function __construct($name = null, Repository $packageRepository = null)
-    {
-        parent::__construct($name);
-        $this->packageRepository = $packageRepository ?: new Repository();
-    }
-
     /**
      * Configure command
      */
@@ -42,11 +26,7 @@ class ValidateCommand extends AbstractBaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $repositoryUrl = $input->getArgument('repository-url');
-        $output->writeln('Scanning packages at ' . $repositoryUrl);
-        $output->writeln('');
-
-        $packages = $this->packageRepository->findAllPackagesFromRepository($repositoryUrl);
+        $packages = $this->getPackagesFromRepository($input, $output);
 
         foreach ($packages as $packageName => $packagePackages) {
             if (!$this->isValidPackageName($packageName)) {
