@@ -1,15 +1,14 @@
 <?php
 namespace IchHabRecht\PackagesScanner\Command\Vendor;
 
+use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
 use IchHabRecht\PackagesScanner\Package\Repository as PackageRepository;
 use IchHabRecht\PackagesScanner\Packagist\Repository as PackagistRepository;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ListCommand extends Command
+class ListCommand extends AbstractBaseCommand
 {
     /**
      * @var PackageRepository
@@ -38,11 +37,11 @@ class ListCommand extends Command
      */
     protected function configure()
     {
+        parent::configure();
         $this
             ->setName('vendor:list')
             ->setDescription('List vendor names')
             ->setHelp('This command checks the Packagist registration of the vendor names')
-            ->addArgument('repository-url', InputArgument::REQUIRED, 'The repository url to your packages.json file')
             ->addOption('only-registered', null, InputOption::VALUE_NONE, 'Show only registered vendor names')
             ->addOption('only-unregistered', null, InputOption::VALUE_NONE, 'Show only unregistered vendor names');
     }

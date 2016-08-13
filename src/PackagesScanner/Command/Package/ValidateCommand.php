@@ -1,13 +1,12 @@
 <?php
 namespace IchHabRecht\PackagesScanner\Command\Package;
 
+use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
 use IchHabRecht\PackagesScanner\Package\Repository;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ValidateCommand extends Command
+class ValidateCommand extends AbstractBaseCommand
 {
     /**
      * @var Repository
@@ -29,11 +28,11 @@ class ValidateCommand extends Command
      */
     protected function configure()
     {
+        parent::configure();
         $this
             ->setName('package:validate')
             ->setDescription('Validate package names')
-            ->setHelp('This command validates the package names found in the provided repository')
-            ->addArgument('repository-url', InputArgument::REQUIRED, 'The repository url to your packages.json file');
+            ->setHelp('This command validates the package names found in the provided repository');
     }
 
     /**

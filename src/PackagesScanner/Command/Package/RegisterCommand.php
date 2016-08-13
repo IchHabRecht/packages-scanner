@@ -1,15 +1,14 @@
 <?php
 namespace IchHabRecht\PackagesScanner\Command\Package;
 
+use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
 use IchHabRecht\PackagesScanner\Package\Repository as PackageRepository;
 use IchHabRecht\PackagesScanner\Packagist\Repository as PackagistRepository;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RegisterCommand extends Command
+class RegisterCommand extends AbstractBaseCommand
 {
     /**
      * @var PackageRepository
@@ -38,13 +37,12 @@ class RegisterCommand extends Command
      */
     protected function configure()
     {
+        parent::configure();
         $this
             ->setName('package:register')
             ->setDescription('Register unregistered packages')
             ->setHelp('This command registers non-existing packages on Packagist')
-            ->addArgument('repository-url', InputArgument::REQUIRED, 'The repository url to your packages.json file')
-            ->addOption('exclude-vendor', null, InputOption::VALUE_OPTIONAL,
-                'Comma separated list of vendor names to exclude');
+            ->addOption('exclude-vendor', null, InputOption::VALUE_OPTIONAL, 'Comma separated list of vendor names to exclude');
     }
 
     /**
