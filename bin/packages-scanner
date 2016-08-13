@@ -3,15 +3,17 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use IchHabRecht\PackagesScanner\Command\Package\RegisterCommand as PackageRegisterCommand;
 use IchHabRecht\PackagesScanner\Command\Package\ValidateCommand;
 use IchHabRecht\PackagesScanner\Command\Vendor\ListCommand;
-use IchHabRecht\PackagesScanner\Command\Vendor\RegisterCommand;
+use IchHabRecht\PackagesScanner\Command\Vendor\RegisterCommand as VendorRegisterCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
 
 $application->add(new ValidateCommand());
+$application->add(new PackageRegisterCommand());
 $application->add(new ListCommand());
-$application->add(new RegisterCommand());
+$application->add(new VendorRegisterCommand());
 
 $application->run();
