@@ -1,0 +1,13 @@
+{
+  "name": "ichhabrecht/packages-scanner",
+  "description": "Scan own packages.json information to check packagist registration of packages",
+  "authors": [
+    {
+      "name": "Nicole Cordes",
+      "email": "typo3@cordes.co"
+    }
+  ],
+  "license": [
+    "MIT"
+  ]
+}
