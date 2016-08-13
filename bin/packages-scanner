@@ -1,7 +1,11 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require __DIR__ . '/../vendor/autoload.php';
+} else {
+    require __DIR__ . '/../../../autoload.php';
+}
 
 use IchHabRecht\PackagesScanner\Command\Package\RegisterCommand as PackageRegisterCommand;
 use IchHabRecht\PackagesScanner\Command\Package\ValidateCommand;
