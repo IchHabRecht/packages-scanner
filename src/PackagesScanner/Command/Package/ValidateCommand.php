@@ -49,7 +49,7 @@ class ValidateCommand extends AbstractBaseCommand
         $packages = $this->packageRepository->findAllPackagesFromRepository($repositoryUrl);
 
         foreach ($packages as $packageName => $packagePackages) {
-            if ($this->isInvalidPackageName($packageName)) {
+            if (!$this->isValidPackageName($packageName)) {
                 $output->writeln(' - ' . $packageName);
                 $packageInformation = array_pop($packagePackages);
                 $output->writeln('   - url: ' . ($packageInformation['source']['url'] ?? $packageInformation['dist']['url']));
@@ -65,16 +65,5 @@ class ValidateCommand extends AbstractBaseCommand
         }
 
         return 0;
-    }
-
-    /**
-     * @param string $packageName
-     * @return bool
-     */
-    protected function isInvalidPackageName($packageName)
-    {
-        return empty($packageName)
-        || !preg_match('{^[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9]([_.-]?[a-z0-9]+)*$}', $packageName)
-        || preg_match('{\.json$}', $packageName);
     }
 }

@@ -69,14 +69,18 @@ class RegisterCommand extends AbstractBaseCommand
             }
 
             $registeredPackageNames = $this->packagistRepository->findPackagesByVendor($vendor);
-            foreach ($vendorPackages as $packageName => $package) {
-                $isRegistered = in_array($vendor . '/' . $packageName, $registeredPackageNames, true);
+            foreach ($vendorPackages as $name => $package) {
+                $packageName = $vendor . '/' . $name;
+                if (!$this->isValidPackageName($packageName)) {
+                    continue;
+                }
 
+                $isRegistered = in_array($packageName, $registeredPackageNames, true);
                 if ($isRegistered) {
                     continue;
                 }
 
-                $output->writeln(' - ' . $vendor . '/' . $packageName);
+                $output->writeln(' - ' . $packageName);
                 $packageInformation = array_pop($package);
                 $output->writeln('   - ' . $packageInformation['name']);
                 $output->writeln('      - url: ' . ($packageInformation['source']['url'] ?? $packageInformation['dist']['url']));
