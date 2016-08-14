@@ -28,6 +28,7 @@ class ValidateCommand extends AbstractBaseCommand
     {
         $packages = $this->getPackagesFromRepository($input, $output);
 
+        $i = 0;
         foreach ($packages as $packageName => $packagePackages) {
             if (!$this->isValidPackageName($packageName)) {
                 $output->writeln(' - ' . $packageName);
@@ -41,8 +42,11 @@ class ValidateCommand extends AbstractBaseCommand
                     }
                 }
                 $output->writeln('');
+                $i++;
             }
         }
+
+        $output->writeln($i . ' invalid packages found');
 
         return 0;
     }

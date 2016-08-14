@@ -46,6 +46,8 @@ class RegisterCommand extends AbstractBaseCommand
     {
         $packages = $this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
 
+        $i = 0;
+        $j = 0;
         foreach ($packages as $vendor => $vendorPackages) {
             $packages = $this->packagistRepository->findPackagesByVendor($vendor);
             $isRegistered = !empty($packages);
@@ -66,9 +68,13 @@ class RegisterCommand extends AbstractBaseCommand
                         }
                     }
                 }
+                $i++;
             }
             $output->writeln('');
+            $j++;
         }
+
+        $output->writeln($i . ' unregistered packages for ' . $j . ' unregistered vendors found');
 
         return 0;
     }

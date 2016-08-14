@@ -52,6 +52,7 @@ class ListCommand extends AbstractBaseCommand
 
         $vendorNames = array_keys($this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output)));
 
+        $i = 0;
         foreach ($vendorNames as $vendor) {
             $packages = $this->packagistRepository->findPackagesByVendor($vendor);
             $isRegistered = !empty($packages);
@@ -62,8 +63,12 @@ class ListCommand extends AbstractBaseCommand
             ) {
                 $output->writeln(' - ' . $vendor);
                 $output->writeln('   - ' . ($isRegistered ? 'registered' : 'unregistered'));
+                $i++;
             }
         }
+
+        $output->writeln('');
+        $output->writeln($i . ' vendors found');
 
         return 0;
     }

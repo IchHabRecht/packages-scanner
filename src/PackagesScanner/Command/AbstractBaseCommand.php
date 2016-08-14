@@ -42,9 +42,12 @@ abstract class AbstractBaseCommand extends Command
     {
         $repositoryUrl = $input->getArgument('repository-url');
         $output->writeln('Scanning packages at ' . $repositoryUrl);
+
+        $packages = $this->packageRepository->findAllPackagesFromRepository($repositoryUrl);
+        $output->writeln(count($packages) . ' packages found');
         $output->writeln('');
 
-        return $this->packageRepository->findAllPackagesFromRepository($repositoryUrl);
+        return $packages;
     }
 
     /**

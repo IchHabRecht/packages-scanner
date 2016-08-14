@@ -51,6 +51,7 @@ class RegisterCommand extends AbstractBaseCommand
 
         $packages = $this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
 
+        $i = 0;
         foreach ($packages as $vendor => $vendorPackages) {
             if (in_array($vendor, $excludeVendorNames, true)) {
                 continue;
@@ -80,8 +81,11 @@ class RegisterCommand extends AbstractBaseCommand
                     }
                 }
                 $output->writeln('');
+                $i++;
             }
         }
+
+        $output->writeln($i . ' unregistered packages found');
 
         return 0;
     }
