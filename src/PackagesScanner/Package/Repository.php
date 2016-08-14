@@ -72,6 +72,34 @@ class Repository
      */
     protected function resolveRepositoryProviderIncludes($repositoryUrl, array $packagesJson)
     {
-        return [];
+        if (empty($packagesJson['provider-includes']) || empty($packagesJson['providers-url'])) {
+            return [];
+        }
+
+        $packages = [];
+        $repositoryUrl = rtrim($repositoryUrl, '/');
+        $providersUrl = ltrim($packagesJson['providers-url'], '/');
+        foreach ($packagesJson['provider-includes'] as $providerFileName => $providerInformation) {
+            $hash = '';
+            if (!empty($providerInformation['sha256'])) {
+                $hash = $providerInformation['sha256'];
+            }
+            $absoluteProviderUrl = $repositoryUrl . '/' . str_replace('%hash%', $hash, ltrim($providerFileName, '/'));
+            $result = $this->client->request('GET', $absoluteProviderUrl);
+            $providers = json_decode($result->getBody(), true)['providers'];
+            foreach ($providers as $packageName => $hashInformation) {
+                $hash = '';
+                if (!empty($hashInformation['sha256'])) {
+                    $hash = $hashInformation['sha256'];
+                }
+                $providerUrl = str_replace('%hash%', $hash, $providersUrl);
+                $providerUrl = str_replace('%package%', $packageName, $providerUrl);
+                $absoluteProviderUrl = $repositoryUrl . '/' . $providerUrl;
+                $result = $this->client->request('GET', $absoluteProviderUrl);
+                $packages += json_decode($result->getBody(), true)['packages'];
+            }
+        }
+
+        return $packages;
     }
 }
