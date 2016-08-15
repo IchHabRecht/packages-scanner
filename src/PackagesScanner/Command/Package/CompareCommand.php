@@ -36,7 +36,8 @@ class CompareCommand extends AbstractBaseCommand
             ->setName('package:compare')
             ->setDescription('Compares local packages with Packagist')
             ->setHelp('This command lists all packages which are found in the provided repository and on Packagist')
-            ->addOption('exclude-vendor', null, InputOption::VALUE_OPTIONAL, 'Comma separated list of vendor names to exclude');
+            ->addOption('exclude-vendor', null, InputOption::VALUE_OPTIONAL, 'Comma separated list of vendor names to exclude')
+            ->addOption('only-different', null, InputOption::VALUE_NONE, 'Show only packages with different sources');
     }
 
     /**
@@ -48,6 +49,8 @@ class CompareCommand extends AbstractBaseCommand
     {
         $excludeVendorNames = explode(',', $input->getOption('exclude-vendor'));
         array_walk($excludeVendorNames, 'trim');
+
+        $onlyDifferent = $input->getOption('only-different');
 
         $packages = $this->getPackagesFromRepository($input, $output);
         $packagistPackages = $this->packagistRepository->findAllPackagesFromRepository();
@@ -86,20 +89,29 @@ class CompareCommand extends AbstractBaseCommand
                     'Local' => array_pop($packages[$packageName]),
                     'Packagist' => array_pop($packagistPackages[$packageName]),
                 ];
-                $output->writeln(' - ' . $packageName);
-                foreach ($packageVersions as $repository => $package) {
-                    $output->writeln('   - ' . $repository);
-                    $output->writeln('      - url: ' . ($package->getSourceUrl() ?: $package->getDistUrl()));
-                    if (!empty($package->getAuthors())) {
-                        foreach ($package->getAuthors() as $author) {
-                            foreach ($author as $property => $value) {
-                                $output->writeln('      - ' . $property . ': ' . $value);
+
+                $showPackage = true;
+                if ($onlyDifferent) {
+                    $source1 = $packageVersions['Local']->getSourceUrl() ?: $packageVersions['Local']->getDistUrl();
+                    $source2 = $packageVersions['Packagist']->getSourceUrl() ?: $packageVersions['Packagist']->getDistUrl();
+                    $showPackage = $source1 !== $source2;
+                }
+                if ($showPackage) {
+                    $output->writeln(' - ' . $packageName);
+                    foreach ($packageVersions as $repository => $package) {
+                        $output->writeln('   - ' . $repository);
+                        $output->writeln('      - url: ' . ($package->getSourceUrl() ?: $package->getDistUrl()));
+                        if (!empty($package->getAuthors())) {
+                            foreach ($package->getAuthors() as $author) {
+                                foreach ($author as $property => $value) {
+                                    $output->writeln('      - ' . $property . ': ' . $value);
+                                }
                             }
                         }
                     }
+                    $output->writeln('');
+                    $i++;
                 }
-                $output->writeln('');
-                $i++;
             }
         }
 

@@ -63,6 +63,10 @@ $ vendor/bin/packages-scanner package:compare https://example.com
 
 Comma separated list of vendor names to exclude from Packagist check.
 
+*--only-different*
+
+Shows only packages which have different registered sources.
+
 ### vendor:list
 
 The command lists all vendor names of the packages found in the provided packages.json.
