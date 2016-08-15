@@ -2,8 +2,8 @@
 namespace IchHabRecht\PackagesScanner\Command\Vendor;
 
 use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
-use IchHabRecht\PackagesScanner\Repository\Repository as PackageRepository;
-use IchHabRecht\PackagesScanner\Packagist\Repository as PackagistRepository;
+use IchHabRecht\PackagesScanner\Repository\PackagistRepository;
+use IchHabRecht\PackagesScanner\Repository\Repository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,10 +16,10 @@ class RegisterCommand extends AbstractBaseCommand
 
     /**
      * @param string $name
-     * @param PackageRepository $packageRepository
+     * @param Repository $packageRepository
      * @param PackagistRepository $packagistRepository
      */
-    public function __construct($name = null, PackageRepository $packageRepository = null, PackagistRepository $packagistRepository = null)
+    public function __construct($name = null, Repository $packageRepository = null, PackagistRepository $packagistRepository = null)
     {
         parent::__construct($name, $packageRepository);
         $this->packagistRepository = $packagistRepository ?: new PackagistRepository();
@@ -45,13 +45,12 @@ class RegisterCommand extends AbstractBaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $packages = $this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
+        $packagistPackages = $this->splitPackagesByVendor($this->packagistRepository->findAllPackagesFromRepository());
 
         $i = 0;
         $j = 0;
         foreach ($packages as $vendor => $vendorPackages) {
-            $packages = $this->packagistRepository->findPackagesByVendor($vendor);
-            $isRegistered = !empty($packages);
-
+            $isRegistered = isset($packagistPackages[$vendor]);
             if ($isRegistered) {
                 continue;
             }
@@ -60,9 +59,9 @@ class RegisterCommand extends AbstractBaseCommand
             foreach ($vendorPackages as $name => $packageVersions) {
                 if (empty($packageVersions)) {
                     $packageVersions = $this->getPackageVersionsFromRepository($vendor . '/' . $name);
-                }
-                if (empty($packageVersions)) {
-                    continue;
+                    if (empty($packageVersions)) {
+                        continue;
+                    }
                 }
 
                 $package = array_pop($packageVersions);

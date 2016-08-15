@@ -2,8 +2,8 @@
 namespace IchHabRecht\PackagesScanner\Command\Package;
 
 use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
-use IchHabRecht\PackagesScanner\Repository\Repository as PackageRepository;
-use IchHabRecht\PackagesScanner\Packagist\Repository as PackagistRepository;
+use IchHabRecht\PackagesScanner\Repository\PackagistRepository;
+use IchHabRecht\PackagesScanner\Repository\Repository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,10 +17,10 @@ class RegisterCommand extends AbstractBaseCommand
 
     /**
      * @param string $name
-     * @param PackageRepository $packageRepository
+     * @param Repository $packageRepository
      * @param PackagistRepository $packagistRepository
      */
-    public function __construct($name = null, PackageRepository $packageRepository = null, PackagistRepository $packagistRepository = null)
+    public function __construct($name = null, Repository $packageRepository = null, PackagistRepository $packagistRepository = null)
     {
         parent::__construct($name, $packageRepository);
         $this->packagistRepository = $packagistRepository ?: new PackagistRepository();
@@ -50,6 +50,7 @@ class RegisterCommand extends AbstractBaseCommand
         array_walk($excludeVendorNames, 'trim');
 
         $packages = $this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output));
+        $packagistPackages = $this->packagistRepository->findAllPackagesFromRepository();
 
         $i = 0;
         foreach ($packages as $vendor => $vendorPackages) {
@@ -57,23 +58,22 @@ class RegisterCommand extends AbstractBaseCommand
                 continue;
             }
 
-            $registeredPackageNames = $this->packagistRepository->findPackagesByVendor($vendor);
             foreach ($vendorPackages as $name => $packageVersions) {
                 $packageName = $vendor . '/' . $name;
                 if (!$this->isValidPackageName($packageName)) {
                     continue;
                 }
 
-                $isRegistered = in_array($packageName, $registeredPackageNames, true);
+                $isRegistered = isset($packagistPackages[$packageName]);
                 if ($isRegistered) {
                     continue;
                 }
 
                 if (empty($packageVersions)) {
                     $packageVersions = $this->getPackageVersionsFromRepository($packageName);
-                }
-                if (empty($packageVersions)) {
-                    continue;
+                    if (empty($packageVersions)) {
+                        continue;
+                    }
                 }
 
                 $output->writeln(' - ' . $packageName);

@@ -2,8 +2,8 @@
 namespace IchHabRecht\PackagesScanner\Command\Vendor;
 
 use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
-use IchHabRecht\PackagesScanner\Repository\Repository as PackageRepository;
-use IchHabRecht\PackagesScanner\Packagist\Repository as PackagistRepository;
+use IchHabRecht\PackagesScanner\Repository\PackagistRepository;
+use IchHabRecht\PackagesScanner\Repository\Repository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,10 +17,10 @@ class ListCommand extends AbstractBaseCommand
 
     /**
      * @param string $name
-     * @param PackageRepository $packageRepository
+     * @param Repository $packageRepository
      * @param PackagistRepository $packagistRepository
      */
-    public function __construct($name = null, PackageRepository $packageRepository = null, PackagistRepository $packagistRepository = null)
+    public function __construct($name = null, Repository $packageRepository = null, PackagistRepository $packagistRepository = null)
     {
         parent::__construct($name, $packageRepository);
         $this->packagistRepository = $packagistRepository ?: new PackagistRepository();
@@ -51,11 +51,11 @@ class ListCommand extends AbstractBaseCommand
         $onlyUnregistered = $input->getOption('only-unregistered');
 
         $vendorNames = array_keys($this->splitPackagesByVendor($this->getPackagesFromRepository($input, $output)));
+        $packagistVendorNames = array_keys($this->splitPackagesByVendor($this->packagistRepository->findAllPackagesFromRepository()));
 
         $i = 0;
         foreach ($vendorNames as $vendor) {
-            $packages = $this->packagistRepository->findPackagesByVendor($vendor);
-            $isRegistered = !empty($packages);
+            $isRegistered = in_array($vendor, $packagistVendorNames, true);
 
             if (!$onlyRegistered && !$onlyUnregistered
                 || $onlyRegistered && $isRegistered
