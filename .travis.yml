@@ -1,0 +1,37 @@
+language: php
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 7
+    - php: 7.1
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - parallel
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_install:
+  - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
+  - composer self-update
+  - composer --version
+
+before_script:
+  - composer install
+
+script:
+  - >
+    echo;
+    echo "Running unit tests";
+    vendor/bin/phpunit --colors tests
+
+  - >
+    echo;
+    echo "Running php lint";
+    find . -name \*.php ! -path "./vendor/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
