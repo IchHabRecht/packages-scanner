@@ -1,22 +1,17 @@
 <?php
 namespace IchHabRecht\PackagesScanner\Package;
 
-use GuzzleHttp\Client;
+use Composer\Factory;
+use Composer\IO\NullIO;
+use Composer\Package\CompletePackage;
+use Composer\Repository\ComposerRepository;
 
 class Repository
 {
     /**
-     * @var Client
+     * @var ComposerRepository
      */
-    private $client;
-
-    /**
-     * @param Client $client
-     */
-    public function __construct(Client $client = null)
-    {
-        $this->client = $client ?: new Client();
-    }
+    private $composerRepository;
 
     /**
      * @param string $repositoryUrl
@@ -24,54 +19,46 @@ class Repository
      */
     public function findAllPackagesFromRepository($repositoryUrl)
     {
-        $packagesJson = $this->getRepositoryContent($repositoryUrl);
-        $packages = $packagesJson['packages'] ?? [];
-        $packages += $this->resolveRepositoryIncludes($repositoryUrl, $packagesJson);
-        $packages += $this->resolveRepositoryProviderIncludes($repositoryUrl, $packagesJson);
+        $io = new NullIO();
+        $config = Factory::createConfig($io);
+        $this->composerRepository = new ComposerRepository([
+            'url' => $repositoryUrl,
+        ], $io, $config);
+
+        $packages = [];
+        if ($this->composerRepository->hasProviders()) {
+            foreach ($this->composerRepository->getProviderNames() as $name) {
+                $packages[$name] = [];
+            }
+        } else {
+            foreach ($this->composerRepository->getPackages() as $package) {
+                if ($package instanceof CompletePackage) {
+                    $packages[$package->getPrettyName()][$package->getPrettyVersion()] = $package;
+                    ksort($packages[$package->getPrettyName()]);
+                }
+            };
+        }
+
         ksort($packages);
 
         return $packages;
     }
 
     /**
-     * @param string $repositoryUrl
-     * @return array
+     * @param string $packageName
+     * @return CompletePackage[]
      */
-    protected function getRepositoryContent($repositoryUrl)
+    public function findPackageVersionsByName($packageName)
     {
-        $result = $this->client->request('GET', rtrim($repositoryUrl, '/') . '/packages.json');
-
-        return json_decode($result->getBody(), true);
-    }
-
-    /**
-     * @param string $repositoryUrl
-     * @param array $packagesJson
-     * @return array
-     */
-    protected function resolveRepositoryIncludes($repositoryUrl, array $packagesJson)
-    {
-        if (empty($packagesJson['includes'])) {
-            return [];
+        $versions = [];
+        foreach ($this->composerRepository->findPackages($packageName) as $package) {
+            if ($package instanceof CompletePackage) {
+                $versions[$package->getPrettyVersion()] = $package;
+            }
         }
 
-        $packages = [];
-        foreach ($packagesJson['includes'] as $include => $information) {
-            $url = rtrim($repositoryUrl, '/') . '/' . $include;
-            $result = $this->client->request('GET', $url);
-            $packages += json_decode($result->getBody(), true)['packages'];
-        }
+        ksort($versions);
 
-        return $packages;
-    }
-
-    /**
-     * @param string $repositoryUrl
-     * @param array $packagesJson
-     * @return array
-     */
-    protected function resolveRepositoryProviderIncludes($repositoryUrl, array $packagesJson)
-    {
-        return [];
+        return $versions;
     }
 }

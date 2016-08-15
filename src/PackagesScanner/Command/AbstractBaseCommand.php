@@ -52,6 +52,15 @@ abstract class AbstractBaseCommand extends Command
 
     /**
      * @param string $packageName
+     * @return \Composer\Package\CompletePackage[]
+     */
+    protected function getPackageVersionsFromRepository($packageName)
+    {
+        return $this->packageRepository->findPackageVersionsByName($packageName);
+    }
+
+    /**
+     * @param string $packageName
      * @return bool
      */
     protected function isValidPackageName($packageName)
