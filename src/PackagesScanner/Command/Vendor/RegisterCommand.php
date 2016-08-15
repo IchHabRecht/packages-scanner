@@ -57,12 +57,19 @@ class RegisterCommand extends AbstractBaseCommand
             }
 
             $output->writeln(' - ' . $vendor);
-            foreach ($vendorPackages as $package) {
-                $packageInformation = array_pop($package);
-                $output->writeln('   - ' . $packageInformation['name']);
-                $output->writeln('      - url: ' . ($packageInformation['source']['url'] ?? $packageInformation['dist']['url']));
-                if (!empty($packageInformation['authors'])) {
-                    foreach ($packageInformation['authors'] as $author) {
+            foreach ($vendorPackages as $name => $packageVersions) {
+                if (empty($packageVersions)) {
+                    $packageVersions = $this->getPackageVersionsFromRepository($vendor . '/' . $name);
+                }
+                if (empty($packageVersions)) {
+                    continue;
+                }
+
+                $package = array_pop($packageVersions);
+                $output->writeln('   - ' . $name);
+                $output->writeln('      - url: ' . ($package->getSourceUrl() ?: $package->getDistUrl()));
+                if (!empty($package->getAuthors())) {
+                    foreach ($package->getAuthors() as $author) {
                         foreach ($author as $property => $value) {
                             $output->writeln('      - ' . $property . ': ' . $value);
                         }
