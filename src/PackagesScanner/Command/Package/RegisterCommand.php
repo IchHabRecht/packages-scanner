@@ -58,7 +58,7 @@ class RegisterCommand extends AbstractBaseCommand
             }
 
             $registeredPackageNames = $this->packagistRepository->findPackagesByVendor($vendor);
-            foreach ($vendorPackages as $name => $package) {
+            foreach ($vendorPackages as $name => $packageVersions) {
                 $packageName = $vendor . '/' . $name;
                 if (!$this->isValidPackageName($packageName)) {
                     continue;
@@ -69,14 +69,20 @@ class RegisterCommand extends AbstractBaseCommand
                     continue;
                 }
 
+                if (empty($packageVersions)) {
+                    $packageVersions = $this->getPackageVersionsFromRepository($packageName);
+                }
+                if (empty($packageVersions)) {
+                    continue;
+                }
+
                 $output->writeln(' - ' . $packageName);
-                $packageInformation = array_pop($package);
-                $output->writeln('   - ' . $packageInformation['name']);
-                $output->writeln('      - url: ' . ($packageInformation['source']['url'] ?? $packageInformation['dist']['url']));
-                if (!empty($packageInformation['authors'])) {
-                    foreach ($packageInformation['authors'] as $author) {
+                $package = array_pop($packageVersions);
+                $output->writeln('   - url: ' . ($package->getSourceUrl() ?: $package->getDistUrl()));
+                if (!empty($package->getAuthors())) {
+                    foreach ($package->getAuthors() as $author) {
                         foreach ($author as $property => $value) {
-                            $output->writeln('      - ' . $property . ': ' . $value);
+                            $output->writeln('   - ' . $property . ': ' . $value);
                         }
                     }
                 }

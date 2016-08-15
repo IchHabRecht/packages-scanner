@@ -29,15 +29,20 @@ class ValidateCommand extends AbstractBaseCommand
         $packages = $this->getPackagesFromRepository($input, $output);
 
         $i = 0;
-        foreach ($packages as $packageName => $packagePackages) {
+        foreach ($packages as $packageName => $packageVersions) {
             if (!$this->isValidPackageName($packageName)) {
                 $output->writeln(' - ' . $packageName);
-                $packageInformation = array_pop($packagePackages);
-                $output->writeln('   - url: ' . ($packageInformation['source']['url'] ?? $packageInformation['dist']['url']));
-                if (!empty($packageInformation['authors'])) {
-                    foreach ($packageInformation['authors'] as $author) {
-                        foreach ($author as $property => $value) {
-                            $output->writeln('   - ' . $property . ': ' . $value);
+                if (empty($packageVersions)) {
+                    $packageVersions = $this->getPackageVersionsFromRepository($packageName);
+                }
+                if (!empty($packageVersions)) {
+                    $package = array_pop($packageVersions);
+                    $output->writeln('   - url: ' . ($package->getSourceUrl() ?: $package->getDistUrl()));
+                    if (!empty($package->getAuthors())) {
+                        foreach ($package->getAuthors() as $author) {
+                            foreach ($author as $property => $value) {
+                                $output->writeln('   - ' . $property . ': ' . $value);
+                            }
                         }
                     }
                 }
