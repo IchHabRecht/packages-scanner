@@ -2,7 +2,7 @@
 namespace IchHabRecht\PackagesScanner\Command\Vendor;
 
 use IchHabRecht\PackagesScanner\Command\AbstractBaseCommand;
-use IchHabRecht\PackagesScanner\Package\Repository as PackageRepository;
+use IchHabRecht\PackagesScanner\Repository\Repository as PackageRepository;
 use IchHabRecht\PackagesScanner\Packagist\Repository as PackagistRepository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

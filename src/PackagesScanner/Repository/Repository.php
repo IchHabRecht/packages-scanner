@@ -1,5 +1,5 @@
 <?php
-namespace IchHabRecht\PackagesScanner\Package;
+namespace IchHabRecht\PackagesScanner\Repository;
 
 use Composer\Factory;
 use Composer\IO\NullIO;
@@ -15,16 +15,21 @@ class Repository
 
     /**
      * @param string $repositoryUrl
-     * @return array
      */
-    public function findAllPackagesFromRepository($repositoryUrl)
+    public function __construct($repositoryUrl)
     {
         $io = new NullIO();
         $config = Factory::createConfig($io);
         $this->composerRepository = new ComposerRepository([
             'url' => $repositoryUrl,
         ], $io, $config);
+    }
 
+    /**
+     * @return array
+     */
+    public function findAllPackagesFromRepository()
+    {
         $packages = [];
         if ($this->composerRepository->hasProviders()) {
             foreach ($this->composerRepository->getProviderNames() as $name) {
@@ -34,11 +39,13 @@ class Repository
             foreach ($this->composerRepository->getPackages() as $package) {
                 if ($package instanceof CompletePackage) {
                     $packages[$package->getPrettyName()][$package->getPrettyVersion()] = $package;
-                    ksort($packages[$package->getPrettyName()]);
                 }
             };
         }
 
+        array_walk($packages, function (&$item) {
+            ksort($item);
+        });
         ksort($packages);
 
         return $packages;

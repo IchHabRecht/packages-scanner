@@ -1,7 +1,7 @@
 <?php
 namespace IchHabRecht\PackagesScanner\Command;
 
-use IchHabRecht\PackagesScanner\Package\Repository;
+use IchHabRecht\PackagesScanner\Repository\Repository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +21,7 @@ abstract class AbstractBaseCommand extends Command
     public function __construct($name = null, Repository $packageRepository = null)
     {
         parent::__construct($name);
-        $this->packageRepository = $packageRepository ?: new Repository();
+        $this->packageRepository = $packageRepository;
     }
 
     /**
@@ -43,7 +43,11 @@ abstract class AbstractBaseCommand extends Command
         $repositoryUrl = $input->getArgument('repository-url');
         $output->writeln('Scanning packages at ' . $repositoryUrl);
 
-        $packages = $this->packageRepository->findAllPackagesFromRepository($repositoryUrl);
+        if (null === $this->packageRepository) {
+            $this->packageRepository = new Repository($repositoryUrl);
+        }
+
+        $packages = $this->packageRepository->findAllPackagesFromRepository();
         $output->writeln(count($packages) . ' packages found');
         $output->writeln('');
 
