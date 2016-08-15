@@ -1,6 +1,7 @@
 <?php
 namespace IchHabRecht\PackagesScanner\Test\Command;
 
+use Composer\Package\CompletePackage;
 use IchHabRecht\PackagesScanner\Repository\PackagistRepository;
 use IchHabRecht\PackagesScanner\Repository\Repository;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +52,11 @@ abstract class AbstractCommandTestCase extends TestCase
     {
         $repositoryProphecy = $this->prophesize(Repository::class);
         $repositoryProphecy->findAllPackagesFromRepository()->willReturn($packages);
-        $repositoryProphecy->findPackageVersionsByName(Argument::any())->willReturn([]);
+        $repositoryProphecy->findPackageVersionsByName(Argument::any())->will(function ($arguments) {
+            return [
+                new CompletePackage($arguments[0], '1.0.0', '1.0.0'),
+            ];
+        });
 
         return $repositoryProphecy;
     }
