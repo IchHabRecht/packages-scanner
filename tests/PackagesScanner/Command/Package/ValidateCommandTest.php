@@ -2,20 +2,10 @@
 namespace IchHabRecht\PackagesScanner\Test\Command\Package;
 
 use IchHabRecht\PackagesScanner\Command\Package\ValidateCommand;
-use IchHabRecht\PackagesScanner\Repository\Repository;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\BufferedOutput;
+use IchHabRecht\PackagesScanner\Test\Command\AbstractCommandTestCase;
 
-class ValidateCommandTest extends TestCase
+class ValidateCommandTest extends AbstractCommandTestCase
 {
-    /**
-     * @var string
-     */
-    private $repositoryUrl = 'https://example.org';
-
     /**
      * @return array
      */
@@ -59,23 +49,9 @@ class ValidateCommandTest extends TestCase
      */
     public function testValidateCommandFindsInvalidPackageNames(array $packages, $expected)
     {
-        $repositoryProphecy = $this->prophesize(Repository::class);
-        $repositoryProphecy->findAllPackagesFromRepository()->willReturn($packages);
-        $repositoryProphecy->findPackageVersionsByName(Argument::any())->willReturn([]);
+        $validateCommand = new ValidateCommand(null, $this->getRepositoryProphecy($packages)->reveal());
+        $validateCommand->run($this->getInputProphecy()->reveal(), $this->output);
 
-        $validateCommand = new ValidateCommand(null, $repositoryProphecy->reveal());
-
-        $inputProphecy = $this->prophesize(InputInterface::class);
-        $inputProphecy->bind(Argument::type(InputDefinition::class))->shouldBeCalled();
-        $inputProphecy->isInteractive()->willReturn(false);
-        $inputProphecy->hasArgument('command')->willReturn(false);
-        $inputProphecy->validate()->shouldBeCalled();
-        $inputProphecy->getArgument('repository-url')->willReturn($this->repositoryUrl);
-
-        $output = new BufferedOutput();
-
-        $validateCommand->run($inputProphecy->reveal(), $output);
-
-        $this->assertContains($expected, $output->fetch());
+        $this->assertContains($expected, $this->output->fetch());
     }
 }
