@@ -48,6 +48,25 @@ $ vendor/bin/packages-scanner package:register https://example.com
 
 Comma separated list of vendor names to exclude from Packagist check.
 
+### package:compare
+
+The command lists all packages found in your packages.json which are also registered on Packagist.
+Furthermore it shows the url and author information of each package for both locations.
+
+```bash
+$ vendor/bin/packages-scanner package:compare https://example.com
+```
+
+**Options**
+
+*--exclude-vendor*
+
+Comma separated list of vendor names to exclude from Packagist check.
+
+*--only-different*
+
+Shows only packages which have different registered sources.
+
 ### vendor:list
 
 The command lists all vendor names of the packages found in the provided packages.json.
