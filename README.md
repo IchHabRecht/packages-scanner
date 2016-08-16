@@ -2,6 +2,9 @@
 
 This application compares packages from your own packages.json repository with information from Packagist.
 
+[![Latest Stable Version](https://img.shields.io/packagist/v/ichhabrecht/packages-scanner.svg)](https://packagist.org/packages/ichhabrecht/packages-scanner)
+[![Build Status](https://img.shields.io/travis/IchHabRecht/packages-scanner/master.svg)](https://travis-ci.org/IchHabRecht/packages-scanner)
+
 ## Installation
 
 ### Installation as own application 
